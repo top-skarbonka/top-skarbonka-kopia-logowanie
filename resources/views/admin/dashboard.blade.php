@@ -1,3 +1,4 @@
+  GNU nano 7.2                       resources/views/admin/dashboard.blade.php                                 
 @extends('layouts.admin')
 
 @section('content')
@@ -12,4 +13,3 @@
             <li>Statystyki aplikacji</li>
         </ul>
     </div>
-@endsection
