@@ -7,29 +7,37 @@ use App\Models\User;
 
 class AdminController extends Controller
 {
+    /**
+     * Panel administratora
+     */
     public function dashboard()
     {
         // Pobieramy wszystkich użytkowników
         $users = User::all();
 
+        // Przekazujemy do widoku admin.dashboard
         return view('admin.dashboard', compact('users'));
     }
 
+    /**
+     * Zapis nowej firmy
+     */
     public function storeCompany(Request $request)
     {
-        // Walidacja danych
-        $validated = $request->validate([
-            'name' => 'required|string|max:255',
-            'postal_code' => 'required|string|max:10',
-            'city' => 'required|string|max:100',
-            'street' => 'required|string|max:255',
-            'nip' => 'required|string|max:15',
-            'email' => 'required|email|max:255',
-            'phone' => 'required|string|max:20',
+        $request->validate([
+            'name'   => 'required|string|max:255',
+            'email'  => 'required|email|unique:users',
+            'phone'  => 'nullable|string|max:20',
+            'address'=> 'nullable|string|max:255',
         ]);
 
-        // Tu w przyszłości zapiszemy dane firmy do bazy
-        // Na razie tylko przekierowanie z komunikatem
-        return redirect()->back()->with('success', 'Firma została dodana poprawnie!');
+        // Tworzymy użytkownika typu "firma"
+        User::create([
+            'name'     => $request->name,
+            'email'    => $request->email,
+            'password' => bcrypt('password'), // hasło domyślne, potem zmieni firma
+        ]);
+
+        return redirect()->route('admin.dashboard')->with('success', 'Firma została dodana!');
     }
 }
