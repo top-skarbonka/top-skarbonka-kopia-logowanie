@@ -1,29 +1,57 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\AdminController;
 
-Route::get('/', function () {
-    return view('welcome');
-});
+/*
+|--------------------------------------------------------------------------
+| Web Routes
+|--------------------------------------------------------------------------
+| Tutaj rejestrujemy wszystkie trasy aplikacji
+|--------------------------------------------------------------------------
+*/
 
-// Wszystko poniżej tylko dla zalogowanych
-Route::middleware(['auth'])->group(function () {
-    // Dashboard
-    Route::get('/dashboard', function () {
-        return view('dashboard');
-    })->name('dashboard');
+// ======================== PANELY ======================== //
 
-    // TRASY PROFILU – wymagane przez layout (navigation.blade.php)
-    Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
-    Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
-    Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+// Panel administratora
+Route::get('/admin', [AdminController::class, 'dashboard'])
+    ->middleware(['auth']) // tylko zalogowani
+    ->name('admin.dashboard');
 
-    // Proste panele
-    Route::get('/admin', fn () => view('admin.dashboard'))->name('admin.dashboard');
-    Route::get('/firma', fn () => view('firma.dashboard'))->name('firma.dashboard');
-    Route::get('/klient', fn () => view('klient.dashboard'))->name('klient.dashboard');
-});
+Route::post('/admin/company', [AdminController::class, 'storeCompany'])
+    ->middleware(['auth'])
+    ->name('admin.company.store');
 
-// Trasy logowania/rejestracji z Breeze
+// Panel firmy
+Route::get('/firma', fn () => view('firma.dashboard'))
+    ->middleware(['auth'])
+    ->name('firma.dashboard');
+
+// Panel klienta
+Route::get('/klient', fn () => view('klient.dashboard'))
+    ->middleware(['auth'])
+    ->name('klient.dashboard');
+
+// ======================== DASHBOARD DEFAULT ======================== //
+
+Route::get('/dashboard', function () {
+    return view('dashboard');
+})->middleware(['auth'])->name('dashboard');
+
+// ======================== FIX PROFILE (JETSTREAM) ======================== //
+// Dodajemy trasy "atrapy", żeby layout Jetstreama się nie wysypywał
+Route::get('/profile', function () {
+    return 'Profile edit page (placeholder)';
+})->name('profile.edit');
+
+Route::patch('/profile', function () {
+    return 'Profile updated (placeholder)';
+})->name('profile.update');
+
+Route::delete('/profile', function () {
+    return 'Profile deleted (placeholder)';
+})->name('profile.destroy');
+
+// ======================== AUTH ======================== //
+
 require __DIR__.'/auth.php';
