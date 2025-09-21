@@ -7,21 +7,21 @@ Route::get('/', function () {
     return view('welcome');
 });
 
-// Dashboard (dla każdego zalogowanego usera)
+// Dashboard (dla zalogowanych)
 Route::middleware(['auth'])->get('/dashboard', function () {
     return view('dashboard');
 })->name('dashboard');
 
-// Panel admina – na razie bez sprawdzania roli (każdy zalogowany ma dostęp)
-Route::middleware(['auth'])->prefix('admin')->group(function () {
-    Route::get('/companies', [CompanyController::class, 'index'])->name('companies.index');
-    Route::get('/companies/create', [CompanyController::class, 'create'])->name('companies.create');
-    Route::post('/companies/store', [CompanyController::class, 'store'])->name('companies.store');
+// Panel admina — proste sprawdzenie zalogowania (rolę dodamy później)
+Route::middleware(['auth'])->group(function () {
+    Route::get('/admin/companies',            [CompanyController::class, 'index'])->name('companies.index');
+    Route::get('/admin/companies/create',     [CompanyController::class, 'create'])->name('companies.create');
+    Route::post('/admin/companies/store',     [CompanyController::class, 'store'])->name('companies.store');
 
-    // ➕ Nowe trasy: edycja i usuwanie
-    Route::get('/companies/{company}/edit', [CompanyController::class, 'edit'])->name('companies.edit');
-    Route::put('/companies/{company}', [CompanyController::class, 'update'])->name('companies.update');
-    Route::delete('/companies/{company}', [CompanyController::class, 'destroy'])->name('companies.destroy');
+    // NOWE:
+    Route::get('/admin/companies/{company}/edit', [CompanyController::class, 'edit'])->name('companies.edit');
+    Route::put('/admin/companies/{company}',      [CompanyController::class, 'update'])->name('companies.update');
+    Route::delete('/admin/companies/{company}',   [CompanyController::class, 'destroy'])->name('companies.destroy');
 });
 
 require __DIR__.'/auth.php';
