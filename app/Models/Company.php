@@ -2,26 +2,18 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class Company extends Model
 {
-    use HasFactory;
-
     protected $fillable = [
-        'name',
-        'postal_code',
-        'city',
-        'street',
+        'nazwa_firmy',
+        'kod_pocztowy',
+        'miasto',
+        'ulica',
         'nip',
         'email',
-        'phone',
-        'password',
-        'company_id',
-    ];
-
-    protected $hidden = [
-        'password',
+        'telefon',
+        'exchange_rate',
     ];
 }

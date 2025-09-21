@@ -4,41 +4,38 @@ namespace App\Http\Controllers;
 
 use App\Models\Company;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Str;
 
 class CompanyController extends Controller
 {
+    public function index()
+    {
+        $companies = Company::orderByDesc('id')->get();
+
+        return view('companies.index', compact('companies'));
+    }
+
     public function create()
     {
-        return view('admin.add-company');
+        return view('companies.create');
     }
 
     public function store(Request $request)
     {
-        $request->validate([
-            'name' => 'required|string|max:255',
-            'postal_code' => 'required|string|max:10',
-            'city' => 'required|string|max:100',
-            'street' => 'required|string|max:255',
-            'nip' => 'required|string|size:10|unique:companies,nip',
-            'email' => 'required|email|unique:companies,email',
-            'phone' => 'nullable|string|max:20',
-            'password' => 'required|string|min:6|confirmed',
+        $data = $request->validate([
+            'nazwa_firmy'  => ['required','string','max:255'],
+            'kod_pocztowy' => ['required','string','max:10'],
+            'miasto'       => ['required','string','max:255'],
+            'ulica'        => ['nullable','string','max:255'],
+            'nip'          => ['required','string','max:15','unique:companies,nip'],
+            'email'        => ['required','email','max:255','unique:companies,email'],
+            'telefon'      => ['nullable','string','max:20'],
+            'exchange_rate'=> ['required','numeric','between:0.01,999.99'],
         ]);
 
-        Company::create([
-            'name' => $request->name,
-            'postal_code' => $request->postal_code,
-            'city' => $request->city,
-            'street' => $request->street,
-            'nip' => $request->nip,
-            'email' => $request->email,
-            'phone' => $request->phone,
-            'password' => Hash::make($request->password),
-            'company_id' => strtoupper(Str::random(10)),
-        ]);
+        Company::create($data);
 
-        return redirect()->route('admin.dashboard')->with('success', 'Firma została dodana!');
+        return redirect()
+            ->route('companies.index')
+            ->with('success', 'Firma została dodana.');
     }
 }
