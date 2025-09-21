@@ -1,27 +1,27 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\ProfileController;
-use App\Http\Controllers\AdminController;
+use App\Http\Controllers\CompanyController;
 
-Route::get('/', fn () => view('welcome'));
+Route::get('/', function () {
+    return view('welcome');
+});
 
-Route::middleware(['auth'])->group(function () {
-    // Dashboard Breeze
-    Route::get('/dashboard', fn () => view('dashboard'))->name('dashboard');
+// Dashboard (dla każdego zalogowanego usera)
+Route::middleware(['auth'])->get('/dashboard', function () {
+    return view('dashboard');
+})->name('dashboard');
 
-    // Panele (demo)
-    Route::get('/firma', fn () => view('firma.dashboard'))->name('firma.dashboard');
-    Route::get('/klient', fn () => view('klient.dashboard'))->name('klient.dashboard');
+// Panel admina – na razie bez sprawdzania roli (każdy zalogowany ma dostęp)
+Route::middleware(['auth'])->prefix('admin')->group(function () {
+    Route::get('/companies', [CompanyController::class, 'index'])->name('companies.index');
+    Route::get('/companies/create', [CompanyController::class, 'create'])->name('companies.create');
+    Route::post('/companies/store', [CompanyController::class, 'store'])->name('companies.store');
 
-    // Panel ADMIN
-    Route::get('/admin', [AdminController::class, 'dashboard'])->name('admin.dashboard');
-    Route::post('/admin/company', [AdminController::class, 'storeCompany'])->name('admin.company.store');
-
-    // Profile (Breeze)
-    Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
-    Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
-    Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+    // ➕ Nowe trasy: edycja i usuwanie
+    Route::get('/companies/{company}/edit', [CompanyController::class, 'edit'])->name('companies.edit');
+    Route::put('/companies/{company}', [CompanyController::class, 'update'])->name('companies.update');
+    Route::delete('/companies/{company}', [CompanyController::class, 'destroy'])->name('companies.destroy');
 });
 
 require __DIR__.'/auth.php';

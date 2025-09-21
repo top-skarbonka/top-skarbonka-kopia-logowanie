@@ -2,18 +2,21 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class Company extends Model
 {
+    use HasFactory;
+
     protected $fillable = [
-        'nazwa_firmy',
-        'kod_pocztowy',
-        'miasto',
-        'ulica',
+        'name',
+        'postal_code',
+        'city',
+        'street',
         'nip',
         'email',
-        'telefon',
+        'phone',
         'exchange_rate',
     ];
 }
