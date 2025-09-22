@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\CompanyController;
 use App\Http\Controllers\CompanyAuthController;
 
@@ -8,26 +9,15 @@ use App\Http\Controllers\CompanyAuthController;
 |--------------------------------------------------------------------------
 | Web Routes
 |--------------------------------------------------------------------------
+|
+| Tutaj są zarejestrowane wszystkie trasy webowe dla aplikacji.
+|
 */
 
-// ✅ Strona startowa przekierowuje do logowania admina
-Route::get('/', function () {
-    return redirect()->route('login');
-});
-
-// ✅ Alias do dashboard (wymagany przez Laravel Breeze/Jetstream)
+// ------------------------
+// Admin routes (z logowaniem admina)
+// ------------------------
 Route::middleware(['auth'])->group(function () {
-    Route::get('/dashboard', function () {
-        return redirect()->route('companies.index');
-    })->name('dashboard');
-});
-
-// ✅ Panel admina – firmy
-Route::middleware(['auth'])->group(function () {
-    Route::get('/admin', function () {
-        return redirect()->route('companies.index');
-    })->name('admin.dashboard');
-
     Route::get('/admin/companies', [CompanyController::class, 'index'])->name('companies.index');
     Route::get('/admin/companies/create', [CompanyController::class, 'create'])->name('companies.create');
     Route::post('/admin/companies/store', [CompanyController::class, 'store'])->name('companies.store');
@@ -37,11 +27,24 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/admin/companies/{id}/download', [CompanyController::class, 'downloadCredentials'])->name('companies.download');
 });
 
-// ✅ Logowanie firm
-Route::get('/company/login', [CompanyAuthController::class, 'showLoginForm'])->name('company.login');
-Route::post('/company/login', [CompanyAuthController::class, 'login'])->name('company.login.submit');
-Route::get('/company/dashboard', [CompanyAuthController::class, 'dashboard'])->middleware('auth:company')->name('company.dashboard');
-Route::post('/company/logout', [CompanyAuthController::class, 'logout'])->name('company.logout');
+// ✅ Trasa wylogowania dla ADMINA
+Route::post('/logout', function () {
+    Auth::logout();
+    return redirect('/login'); // albo /admin/login jeśli masz osobny login admina
+})->name('logout');
 
-// ✅ Standardowe logowanie admina (Laravel Breeze/Jetstream)
-require __DIR__.'/auth.php';
+// ------------------------
+// Company routes (panel firmowy)
+// ------------------------
+Route::prefix('company')->group(function () {
+    Route::get('/login', [CompanyAuthController::class, 'showLoginForm'])->name('company.login');
+    Route::post('/login', [CompanyAuthController::class, 'login'])->name('company.login.submit');
+    Route::post('/logout', [CompanyAuthController::class, 'logout'])->name('company.logout');
+
+    Route::middleware('auth:company')->group(function () {
+        Route::get('/dashboard', [CompanyAuthController::class, 'dashboard'])->name('company.dashboard');
+        Route::get('/profile', [CompanyAuthController::class, 'profile'])->name('company.profile');
+        Route::get('/change-password', [CompanyAuthController::class, 'showChangePasswordForm'])->name('company.password.form');
+        Route::post('/change-password', [CompanyAuthController::class, 'updatePassword'])->name('company.password.update');
+    });
+});

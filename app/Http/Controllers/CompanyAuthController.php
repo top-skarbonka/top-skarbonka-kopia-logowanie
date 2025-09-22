@@ -9,57 +9,34 @@ use App\Models\Company;
 
 class CompanyAuthController extends Controller
 {
-    /**
-     * Pokaż formularz logowania firmy
-     */
     public function showLoginForm()
     {
         return view('company.login');
     }
 
-    /**
-     * Obsługa logowania firmy
-     */
     public function login(Request $request)
     {
-        $credentials = $request->validate([
-            'email' => ['required', 'email'],
-            'password' => ['required', 'string'],
-        ]);
+        $credentials = $request->only('email', 'password');
 
-        // Próba logowania do guard: company
-        if (Auth::guard('company')->attempt($credentials, $request->filled('remember'))) {
-            $request->session()->regenerate();
-
-            return redirect()->intended(route('company.dashboard'))
-                ->with('success', 'Zalogowano pomyślnie.');
+        if (Auth::guard('company')->attempt($credentials)) {
+            return redirect()->route('company.dashboard');
         }
 
-        return back()->withErrors([
-            'email' => 'Nieprawidłowy email lub hasło.',
-        ])->onlyInput('email');
+        return back()->withErrors(['email' => 'Nieprawidłowe dane logowania']);
     }
 
-    /**
-     * Dashboard firmy
-     */
-    public function dashboard()
-    {
-        $company = Auth::guard('company')->user();
-
-        return view('company.dashboard', compact('company'));
-    }
-
-    /**
-     * Wylogowanie firmy
-     */
     public function logout(Request $request)
     {
         Auth::guard('company')->logout();
+        return redirect()->route('company.login');
+    }
 
-        $request->session()->invalidate();
-        $request->session()->regenerateToken();
+    public function dashboard()
+    {
+        // Pobierz aktualnie zalogowaną firmę
+        $company = Auth::guard('company')->user();
 
-        return redirect()->route('company.login')->with('success', 'Wylogowano pomyślnie.');
+        // Przekaż dane do widoku
+        return view('company.dashboard', compact('company'));
     }
 }
