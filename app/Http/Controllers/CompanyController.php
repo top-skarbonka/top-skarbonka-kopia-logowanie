@@ -9,20 +9,17 @@ use Illuminate\Support\Facades\Response;
 
 class CompanyController extends Controller
 {
-    // ✅ lista firm
     public function index()
     {
         $companies = Company::all();
         return view('companies.index', compact('companies'));
     }
 
-    // ✅ formularz dodawania nowej firmy
     public function create()
     {
         return view('companies.create');
     }
 
-    // ✅ zapis nowej firmy
     public function store(Request $request)
     {
         $validated = $request->validate([
@@ -36,10 +33,10 @@ class CompanyController extends Controller
             'exchange_rate' => 'required|numeric|min:0.01',
         ]);
 
-        // 🔑 generujemy losowe hasło
+        // ✅ Generujemy losowe hasło
         $plainPassword = Str::random(8);
 
-        // ✅ tworzymy firmę
+        // ✅ Tworzymy firmę z zaszyfrowanym hasłem
         $company = Company::create([
             'name' => $validated['name'],
             'postal_code' => $validated['postal_code'],
@@ -52,53 +49,37 @@ class CompanyController extends Controller
             'password' => bcrypt($plainPassword),
         ]);
 
-        return redirect()->route('companies.index')
-            ->with('success', "Firma została zarejestrowana! ID: {$company->id}, Hasło: {$plainPassword}");
-    }
-
-    // ✅ edycja firmy
-    public function edit(Company $company)
-    {
-        return view('companies.edit', compact('company'));
-    }
-
-    // ✅ aktualizacja firmy
-    public function update(Request $request, Company $company)
-    {
-        $validated = $request->validate([
-            'name' => 'required|string|max:255',
-            'postal_code' => 'required|string|max:20',
-            'city' => 'required|string|max:255',
-            'street' => 'required|string|max:255',
-            'nip' => 'required|string|max:20|unique:companies,nip,' . $company->id,
-            'email' => 'required|email|unique:companies,email,' . $company->id,
-            'phone' => 'nullable|string|max:20',
-            'exchange_rate' => 'required|numeric|min:0.01',
+        // ✅ Zapisz hasło do sesji, żeby admin mógł je pobrać
+        session([
+            'company_credentials' => [
+                'id' => $company->id,
+                'email' => $company->email,
+                'password' => $plainPassword,
+            ]
         ]);
 
-        $company->update($validated);
-
-        return redirect()->route('companies.index')->with('success', 'Dane firmy zostały zaktualizowane.');
+        return redirect()->route('companies.index')
+            ->with('success', "Firma została zarejestrowana! 
+            ID firmy: {$company->id}, Email: {$company->email}, Hasło: {$plainPassword}");
     }
 
-    // ✅ usuwanie firmy
-    public function destroy(Company $company)
-    {
-        $company->delete();
-        return redirect()->route('companies.index')->with('success', 'Firma została usunięta.');
-    }
-
-    // ✅ pobieranie danych logowania jako plik
+    // ✅ Pobieranie danych logowania w TXT
     public function downloadCredentials($id)
     {
-        $company = Company::findOrFail($id);
+        $credentials = session('company_credentials');
 
-        // UWAGA: hasło plain nie jest zapisywane w DB
-        $content = "ID firmy: {$company->id}\nEmail: {$company->email}\nHasło: (wygenerowane podczas rejestracji)";
+        if (!$credentials || $credentials['id'] != $id) {
+            return redirect()->route('companies.index')
+                ->with('error', 'Dane logowania nie są już dostępne.');
+        }
+
+        $content = "ID firmy: {$credentials['id']}\n";
+        $content .= "Email: {$credentials['email']}\n";
+        $content .= "Hasło: {$credentials['password']}\n";
 
         return Response::make($content, 200, [
             'Content-Type' => 'text/plain',
-            'Content-Disposition' => "attachment; filename=credentials_company_{$company->id}.txt",
+            'Content-Disposition' => "attachment; filename=credentials_company_{$id}.txt"
         ]);
     }
 }
