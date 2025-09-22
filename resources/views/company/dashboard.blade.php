@@ -1,18 +1,24 @@
-<x-app-layout>
-    <x-slot name="header">
-        <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-            🏢 Panel firmy
-        </h2>
-    </x-slot>
-
-    <div class="py-6">
-        <div class="max-w-5xl mx-auto sm:px-6 lg:px-8 bg-white shadow p-6 rounded">
-            <h3 class="text-lg font-bold mb-4">Witaj, {{ Auth::guard('company')->user()->name }}</h3>
-
-            <p class="text-gray-700">
-                Hasło zostało wygenerowane przy rejestracji i nie jest przechowywane w panelu.
-                Jeśli go nie masz, poproś administratora o reset.
-            </p>
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <title>Panel Firmy</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body class="bg-light">
+    <div class="container mt-5">
+        <div class="card p-4 shadow">
+            <h1 class="h3 mb-3">👋 Witaj w panelu firmy!</h1>
+            <p>Jesteś zalogowany jako <strong>{{ Auth::guard('company')->user()->email }}</strong>.</p>
+            <a href="{{ route('company.logout') }}" 
+               onclick="event.preventDefault(); document.getElementById('logout-form').submit();" 
+               class="btn btn-danger">
+               Wyloguj się
+            </a>
+            <form id="logout-form" action="{{ route('company.logout') }}" method="POST" style="display: none;">
+                @csrf
+            </form>
         </div>
     </div>
-</x-app-layout>
+</body>
+</html>
