@@ -28,12 +28,23 @@
                     <td>{{ $company->city }}</td>
                     <td>{{ $company->email }}</td>
                     <td>
-                        <a href="{{ route('companies.edit', $company->id) }}" class="btn btn-warning btn-sm">✏️ Edytuj</a>
-                        <a href="{{ route('companies.download', $company->id) }}" class="btn btn-success btn-sm">⬇️ Pobierz dane</a>
-                        <form action="{{ route('companies.destroy', $company->id) }}" method="POST" style="display:inline;">
+                        {{-- Guzik edytuj --}}
+                        <a href="{{ route('companies.edit', $company->id) }}" class="btn btn-warning btn-sm">
+                            ✏️ Edytuj
+                        </a>
+
+                        {{-- Guzik pobierz dane --}}
+                        <a href="{{ route('companies.download', $company->id) }}" class="btn btn-success btn-sm">
+                            ⬇️ Pobierz dane
+                        </a>
+
+                        {{-- Guzik usuń --}}
+                        <form action="{{ route('companies.destroy', $company->id) }}" method="POST" style="display:inline-block;">
                             @csrf
                             @method('DELETE')
-                            <button type="submit" class="btn btn-danger btn-sm">🗑️ Usuń</button>
+                            <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Na pewno chcesz usunąć tę firmę?')">
+                                🗑️ Usuń
+                            </button>
                         </form>
                     </td>
                 </tr>

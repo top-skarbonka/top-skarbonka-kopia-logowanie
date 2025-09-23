@@ -23,38 +23,38 @@
                 <div>
                     <label class="block font-medium">Nazwa firmy</label>
                     <input type="text" name="name" value="{{ old('name', $company->name) }}"
-                           class="w-full border-gray-300 rounded-md shadow-sm">
+                           class="w-full border-gray-300 rounded-md shadow-sm" required>
                 </div>
 
                 <div class="grid grid-cols-2 gap-4">
                     <div>
                         <label class="block font-medium">Kod pocztowy</label>
                         <input type="text" name="postal_code" value="{{ old('postal_code', $company->postal_code) }}"
-                               class="w-full border-gray-300 rounded-md shadow-sm">
+                               class="w-full border-gray-300 rounded-md shadow-sm" required>
                     </div>
                     <div>
                         <label class="block font-medium">Miasto</label>
                         <input type="text" name="city" value="{{ old('city', $company->city) }}"
-                               class="w-full border-gray-300 rounded-md shadow-sm">
+                               class="w-full border-gray-300 rounded-md shadow-sm" required>
                     </div>
                 </div>
 
                 <div>
                     <label class="block font-medium">Ulica</label>
                     <input type="text" name="street" value="{{ old('street', $company->street) }}"
-                           class="w-full border-gray-300 rounded-md shadow-sm">
+                           class="w-full border-gray-300 rounded-md shadow-sm" required>
                 </div>
 
                 <div>
                     <label class="block font-medium">NIP</label>
                     <input type="text" name="nip" value="{{ old('nip', $company->nip) }}"
-                           class="w-full border-gray-300 rounded-md shadow-sm">
+                           class="w-full border-gray-300 rounded-md shadow-sm" required>
                 </div>
 
                 <div>
                     <label class="block font-medium">Email</label>
                     <input type="email" name="email" value="{{ old('email', $company->email) }}"
-                           class="w-full border-gray-300 rounded-md shadow-sm">
+                           class="w-full border-gray-300 rounded-md shadow-sm" required>
                 </div>
 
                 <div>
@@ -65,18 +65,13 @@
 
                 <div>
                     <label class="block font-medium">Przelicznik punktów</label>
-                    <input type="number" step="0.01" name="exchange_rate" 
-                           value="{{ old('exchange_rate', $company->exchange_rate) }}"
-                           class="w-full border-gray-300 rounded-md shadow-sm">
+                    <input type="number" step="0.01" name="exchange_rate" value="{{ old('exchange_rate', $company->exchange_rate) }}"
+                           class="w-full border-gray-300 rounded-md shadow-sm" required>
                 </div>
 
-                <div class="flex justify-end">
-                    <a href="{{ route('companies.index') }}" class="px-4 py-2 bg-gray-500 text-white rounded mr-2">
-                        ⬅️ Powrót
-                    </a>
-                    <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded">
-                        💾 Zapisz zmiany
-                    </button>
+                <div class="flex items-center gap-4">
+                    <button type="submit" class="bg-green-600 text-white px-4 py-2 rounded">💾 Zapisz zmiany</button>
+                    <a href="{{ route('companies.index') }}" class="bg-gray-500 text-white px-4 py-2 rounded">↩️ Powrót</a>
                 </div>
             </form>
         </div>

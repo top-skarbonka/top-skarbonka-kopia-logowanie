@@ -16,7 +16,7 @@ class AdminSeeder extends Seeder
         User::updateOrCreate(
             ['email' => 'admin@top-skarbonka.pl'],
             [
-                'name' => 'Admin',
+                'name' => 'Administrator',
                 'password' => Hash::make('password'),
             ]
         );
